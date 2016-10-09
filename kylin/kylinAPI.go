@@ -63,6 +63,7 @@ func QueryKylin(query *Query) (code int, body []byte, err error) {
 	request := getRequest()
 	request.SetRequestURI(url + "/kylin/api/query")
 	request.Header.SetMethod("POST")
+	request.Header.Set("Content-Type", "application/json")
 	request.SetBody(query.GetBytes())
 	return do(request)
 }
