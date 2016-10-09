@@ -8,7 +8,8 @@ import (
 //Query 查询条件封装
 type Query struct {
 	SQL           string `json:"sql"`
-	Offset, Limit int    `json:"offset"`
+	Offset        int    `json:"offset"`
+	Limit         int    `json:"limit"`
 	AcceptPartial bool   `json:"acceptPartial"`
 	Project       string `json:"project"`
 }
