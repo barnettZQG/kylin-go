@@ -1,11 +1,12 @@
 package kylin
 
 import (
+	"encoding/json"
 	"fmt"
+	"kylin-orm/models"
 	"reflect"
 	"strconv"
 	"strings"
-	"time"
 )
 
 type DataBase struct {
@@ -13,43 +14,10 @@ type DataBase struct {
 }
 
 //QueryAll 查询主方法
-func (d *DataBase) QueryAll(tableName string, where interface{}, offset, limit int) ([]byte, error) {
-	tableName = strings.ToUpper(tableName)
-	reflect.TypeOf(where)
-	s := reflect.ValueOf(where).Elem()
-	st := reflect.TypeOf(where).Elem()
-	queryWhere := "Select * from " + tableName + " where 1=1 "
-	for i := 0; i < s.NumField(); i++ {
-		f := s.Field(i)
-		ft := st.Field(i)
-		if f.Type().String() == "int" {
-			if ft.Tag.Get("kylin") == "necessary" && f.Interface().(int) == 0 {
-				return nil, fmt.Errorf(ft.Name + "字段是必须的字段")
-			} else if f.Interface().(int) != 0 {
-				queryWhere = queryWhere + " and " + tableName + "." + strings.ToUpper(ft.Tag.Get("json")) + "=" + strconv.Itoa(f.Interface().(int))
-			}
-		}
-		if f.Type().String() == "string" {
-			if ft.Tag.Get("kylin") == "necessary" && f.Interface().(string) == "" {
-				return nil, fmt.Errorf(ft.Name + "字段是必须的字段")
-			} else if f.Interface().(string) != "" {
-				queryWhere = queryWhere + " and " + tableName + "." + strings.ToUpper(ft.Tag.Get("json")) + "='" + f.Interface().(string) + "'"
-			}
-		}
-		if f.Type().String() == "float64" {
-			if ft.Tag.Get("kylin") == "necessary" && f.Interface().(float64) == 0.0 {
-				return nil, fmt.Errorf(ft.Name + "字段是必须的字段")
-			} else if f.Interface().(float64) != 0.0 {
-				queryWhere = queryWhere + " and " + tableName + "." + strings.ToUpper(ft.Tag.Get("json")) + "=" + strconv.FormatFloat(f.Interface().(float64), 'g', 2, 64)
-			}
-		}
-		if f.Type().String() == "time.Time" {
-			if ft.Tag.Get("kylin") == "necessary" && f.Interface().(time.Time).IsZero() {
-				return nil, fmt.Errorf(ft.Name + "字段是必须的字段")
-			} else if !f.Interface().(time.Time).IsZero() {
-				queryWhere = queryWhere + " and " + tableName + "." + strings.ToUpper(ft.Tag.Get("json")) + ">='" + f.Interface().(time.Time).Format("2006-01-01") + "'"
-			}
-		}
+func (d *DataBase) QueryAll(tableName string, where interface{}, offset, limit int) (*QueryResult, error) {
+	queryWhere, err := d.getSQL(where, tableName)
+	if err != nil {
+		return nil, err
 	}
 	fmt.Println(queryWhere)
 	query := &Query{
@@ -65,10 +33,91 @@ func (d *DataBase) QueryAll(tableName string, where interface{}, offset, limit i
 	if code != 200 {
 		return nil, fmt.Errorf("kylin server return error:" + string(body))
 	}
-	return body, nil
+	return d.handleBody(body)
 }
 
 //QueryOne 查询一个
-func (d *DataBase) QueryOne(where interface{}) interface{} {
-	return nil
+func (d *DataBase) QueryOne(tableName string, where interface{}) (*QueryResult, error) {
+	queryWhere, err := d.getSQL(where, tableName)
+	if err != nil {
+		return nil, err
+	}
+	fmt.Println(queryWhere)
+	query := &Query{
+		SQL:     queryWhere,
+		Limit:   1,
+		Offset:  0,
+		Project: d.ProjectName,
+	}
+	code, body, err := QueryKylin(query)
+	if err != nil {
+		return nil, err
+	}
+	if code != 200 {
+		return nil, fmt.Errorf("kylin server return error:" + string(body))
+	}
+	return d.handleBody(body)
+}
+
+//GetSQL 构建查询sql
+func (d *DataBase) getSQL(where interface{}, tableName string) (string, error) {
+	tableName = strings.ToUpper(tableName)
+	reflect.TypeOf(where)
+	s := reflect.ValueOf(where).Elem()
+	st := reflect.TypeOf(where).Elem()
+	queryWhere := "Select * from " + tableName + " where 1=1 "
+	for i := 0; i < s.NumField(); i++ {
+
+		f := s.Field(i)
+		ft := st.Field(i)
+		//忽略字段
+		if ft.Tag.Get("kylin") == "nowhere" {
+			continue
+		}
+		if f.Type().String() == "int" {
+			if ft.Tag.Get("kylin") == "necessary" && f.Interface().(int) == 0 {
+				return "", fmt.Errorf(ft.Name + "字段是必须的字段")
+			} else if f.Interface().(int) != 0 {
+				queryWhere = queryWhere + " and " + tableName + "." + strings.ToUpper(ft.Tag.Get("json")) + "=" + strconv.Itoa(f.Interface().(int))
+			}
+		}
+		if f.Type().String() == "string" {
+			if ft.Tag.Get("kylin") == "necessary" && f.Interface().(string) == "" {
+				return "", fmt.Errorf(ft.Name + "字段是必须的字段")
+			} else if f.Interface().(string) != "" {
+				queryWhere = queryWhere + " and " + tableName + "." + strings.ToUpper(ft.Tag.Get("json")) + "='" + f.Interface().(string) + "'"
+			}
+		}
+		if f.Type().String() == "float64" {
+			if ft.Tag.Get("kylin") == "necessary" && f.Interface().(float64) == 0.0 {
+				return "", fmt.Errorf(ft.Name + "字段是必须的字段")
+			} else if f.Interface().(float64) != 0.0 {
+				queryWhere = queryWhere + " and " + tableName + "." + strings.ToUpper(ft.Tag.Get("json")) + "=" + strconv.FormatFloat(f.Interface().(float64), 'g', 2, 64)
+			}
+		}
+		if f.Type().String() == "models.KylinTime" {
+			if ft.Tag.Get("kylin") == "necessary" && f.Interface().(models.KylinTime).IsZero() {
+				return "", fmt.Errorf(ft.Name + "字段是必须的字段")
+			} else if !f.Interface().(models.KylinTime).IsZero() {
+				queryWhere = queryWhere + " and " + tableName + "." + strings.ToUpper(ft.Tag.Get("json")) + ">='" + f.Interface().(models.KylinTime).StartTime.Format("2006-01-02") + "'"
+				queryWhere = queryWhere + " and " + tableName + "." + strings.ToUpper(ft.Tag.Get("json")) + "<'" + f.Interface().(models.KylinTime).EndTime.Format("2006-01-02") + "'"
+			}
+		}
+	}
+	return queryWhere, nil
+}
+
+func (d *DataBase) handleBody(body []byte) (*QueryResult, error) {
+	if body == nil {
+		return nil, nil
+	}
+	re := &QueryResult{}
+	err := json.Unmarshal(body, re)
+	if err != nil {
+		return nil, err
+	}
+	if re.IsException {
+		return nil, fmt.Errorf(re.ExceptionMessage)
+	}
+	return re, nil
 }

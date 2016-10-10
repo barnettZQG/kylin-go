@@ -5,7 +5,7 @@ import (
 )
 
 //DspOnlineReport dsp数据模型
-//model 实例，支持类型包括：string,int,Time,float64
+//model 实例，支持类型包括：string,int,KylinTime,float64
 //kylin:"necessary"代表此字段必须指定，才能查询
 type DspOnlineReport struct {
 	AdCreative     string    `json:"ad_creative" kylin:"necessary"`
@@ -21,23 +21,34 @@ type DspOnlineReport struct {
 	MediaCity      string    `json:"media_city"`
 	MediaDomain    string    `json:"media_domain"`
 	MediaApp       string    `json:"media_app"`
-	PartTs         time.Time `json:"part_ts" kylin:"necessary"`
-	BidFloor       float64   `json:"bid_floor"`
-	BidPrice       float64   `json:"bid_price"`
-	Ereq           int       `json:"ereq"`
-	Request        int       `json:"request"`
-	OemPrice       float64   `json:"oem_price"`
-	AdxPrice       float64   `json:"adx_price"`
-	PV             int       `json:"pv"`
-	Epv            int       `json:"epv"`
-	UV             int       `json:"uv"`
-	IP             int       `json:"ip"`
-	Price          float64   `json:"price"`
-	Money          float64   `json:"money"`
-	Click          int       `json:"click"`
-	Eclick         int       `json:"eclick"`
-	Arrive         int       `json:"arrive"`
-	Stay           int       `json:"stay"`
-	Conversion     int       `json:"conversion"`
-	Register       int       `json:"register"`
+	PartTs         KylinTime `json:"part_ts" kylin:"necessary"`
+	BidFloor       float64   `json:"bid_floor" kylin:"nowhere"`
+	BidPrice       float64   `json:"bid_price" kylin:"nowhere"`
+	Ereq           int       `json:"ereq" kylin:"nowhere"`
+	Request        int       `json:"request" kylin:"nowhere"`
+	OemPrice       float64   `json:"oem_price" kylin:"nowhere"`
+	AdxPrice       float64   `json:"adx_price" kylin:"nowhere"`
+	PV             int       `json:"pv" kylin:"nowhere"`
+	Epv            int       `json:"epv" kylin:"nowhere"`
+	UV             int       `json:"uv" kylin:"nowhere"`
+	IP             int       `json:"ip" kylin:"nowhere"`
+	Price          float64   `json:"price" kylin:"nowhere"`
+	Money          float64   `json:"money" kylin:"nowhere"`
+	Click          int       `json:"click" kylin:"nowhere"`
+	Eclick         int       `json:"eclick" kylin:"nowhere"`
+	Arrive         int       `json:"arrive" kylin:"nowhere"`
+	Stay           int       `json:"stay" kylin:"nowhere"`
+	Conversion     int       `json:"conversion" kylin:"nowhere"`
+	Register       int       `json:"register" kylin:"nowhere"`
+}
+
+//KylinTime kylin-orm对于时间的处理类型
+type KylinTime struct {
+	StartTime time.Time `json:"start_time"`
+	EndTime   time.Time `json:"end_time"`
+}
+
+//IsZero 判断是否为0值
+func (kt KylinTime) IsZero() bool {
+	return kt.StartTime.IsZero() && kt.EndTime.IsZero()
 }
