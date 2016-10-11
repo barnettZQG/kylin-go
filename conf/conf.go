@@ -17,11 +17,11 @@ func init() {
 	if homePath, err = filepath.Abs(filepath.Dir(os.Args[0])); err != nil {
 		panic(err)
 	}
-	workPath, err := os.Getwd()
-	if err != nil {
-		panic(err)
-	}
-	_ = workPath
+	// workPath, err := os.Getwd()
+	// if err != nil {
+	// 	panic(err)
+	// }
+	workPath := "/Users/qingguo/gowork/src/kylin-orm"
 	configPath = filepath.Join(workPath, "conf", "conf.json")
 	load()
 }
@@ -40,6 +40,11 @@ func load() {
 //Get 获取配置
 func Get(k string) interface{} {
 	return avg.Get(k)
+}
+
+//String 获取配置
+func String(k string) string {
+	return avg.String(k)
 }
 
 //Set 添加配置

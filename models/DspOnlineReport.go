@@ -22,24 +22,24 @@ type DspOnlineReport struct {
 	MediaDomain    string    `json:"media_domain"`
 	MediaApp       string    `json:"media_app"`
 	PartTs         KylinTime `json:"part_ts" kylin:"necessary"`
-	BidFloor       float64   `json:"bid_floor" kylin:"nowhere"`
-	BidPrice       float64   `json:"bid_price" kylin:"nowhere"`
-	Ereq           int       `json:"ereq" kylin:"nowhere"`
-	Request        int       `json:"request" kylin:"nowhere"`
-	OemPrice       float64   `json:"oem_price" kylin:"nowhere"`
-	AdxPrice       float64   `json:"adx_price" kylin:"nowhere"`
-	PV             int       `json:"pv" kylin:"nowhere"`
-	Epv            int       `json:"epv" kylin:"nowhere"`
-	UV             int       `json:"uv" kylin:"nowhere"`
-	IP             int       `json:"ip" kylin:"nowhere"`
-	Price          float64   `json:"price" kylin:"nowhere"`
-	Money          float64   `json:"money" kylin:"nowhere"`
-	Click          int       `json:"click" kylin:"nowhere"`
-	Eclick         int       `json:"eclick" kylin:"nowhere"`
-	Arrive         int       `json:"arrive" kylin:"nowhere"`
-	Stay           int       `json:"stay" kylin:"nowhere"`
-	Conversion     int       `json:"conversion" kylin:"nowhere"`
-	Register       int       `json:"register" kylin:"nowhere"`
+	BidFloor       float64   `json:"bid_floor omitempty" kylin:"nowhere"`
+	BidPrice       float64   `json:"bid_price omitempty" kylin:"nowhere"`
+	Ereq           int       `json:"ereq omitempty" kylin:"nowhere"`
+	Request        int       `json:"request omitempty" kylin:"nowhere"`
+	OemPrice       float64   `json:"oem_price omitempty" kylin:"nowhere"`
+	AdxPrice       float64   `json:"adx_price omitempty" kylin:"nowhere"`
+	PV             int       `json:"pv omitempty" kylin:"nowhere"`
+	Epv            int       `json:"epv omitempty" kylin:"nowhere"`
+	UV             int       `json:"uv omitempty" kylin:"nowhere"`
+	IP             int       `json:"ip omitempty" kylin:"nowhere"`
+	Price          float64   `json:"price omitempty" kylin:"nowhere"`
+	Money          float64   `json:"money omitempty" kylin:"nowhere"`
+	Click          int       `json:"click omitempty" kylin:"nowhere"`
+	Eclick         int       `json:"eclick omitempty" kylin:"nowhere"`
+	Arrive         int       `json:"arrive omitempty" kylin:"nowhere"`
+	Stay           int       `json:"stay omitempty" kylin:"nowhere"`
+	Conversion     int       `json:"conversion omitempty" kylin:"nowhere"`
+	Register       int       `json:"register omitempty" kylin:"nowhere"`
 }
 
 //KylinTime kylin-orm对于时间的处理类型

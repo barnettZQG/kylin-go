@@ -1,5 +1,6 @@
 {
     "kylin_url":"http://10.14.1.28:7070",
     "kylin_user":"ADMIN",
-    "kylin_pass":"KYLIN"
+    "kylin_pass":"KYLIN",
+    "kylin_project":"dsp_online_test"
 }

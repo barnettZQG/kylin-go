@@ -1,4 +1,4 @@
-package kylin
+package test
 
 // import (
 // 	"fmt"

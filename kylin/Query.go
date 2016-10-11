@@ -40,6 +40,12 @@ type QueryResult struct {
 	Partial           bool          `json:"partial"`
 }
 
+//QueryOut 返回上层数据
+type QueryOut struct {
+	ColumnMetas []string      `json:"columnMetas"`
+	Result      []interface{} `json:"results"`
+}
+
 //CreateModel 创建查询结果的实体对象
 func (qr *QueryResult) CreateModel() {
 
